@@ -110,7 +110,7 @@
                                     Descargar <i class="bi bi-cloud-download"></i>
                                 </a>
                             @else
-                                <button class="btn btn-sm btn-secondary shadow-sm fw-semibold" disabled>
+                                <button class="btn btn-sm btn-secondary shadow-sm fw-semibold" >
                                     Descargar <i class="bi bi-cloud-download"></i>
                                 </button>
                             @endif
