@@ -45,9 +45,9 @@ Route::get('/logout',[UsuarioController::class, 'logout'])->name('logout');
 
 Route::resource('aprendices', AprendizController::class)->only(['index', 'create', 'store', 'desacarga']);
 
-Route::get('/descargarAprendiz/{id}/{numeroDocumento}/{ficha}', [ZipController::class, 'ZipFile']);
+Route::get('/descargarAprendiz/{id}/{numeroDocumento}/{ficha}', [ZipController::class, 'ZipFile'])->middleware('auth');
 
-Route::get('/descargarFicha/{ficha}', [ZipController::class, 'ZipFolder']);
+Route::get('/descargarFicha/{ficha}', [ZipController::class, 'ZipFolder'])->middleware('auth');
 
 
 // POST ROUTES

@@ -22,7 +22,7 @@ class ZipController extends Controller
             }
             $zip->close();
         }
-        return response()->download(public_path($fileName));
+        return response()->download(public_path($fileName))->deleteFileAfterSend(true);
     }
 
     public function ZipFolder($ficha){
@@ -48,6 +48,6 @@ class ZipController extends Controller
         }
 
         $zip->close();
-        return response()->download(public_path($folderName));
+        return response()->download(public_path($folderName))->deleteFileAfterSend(true);
     }
 }
