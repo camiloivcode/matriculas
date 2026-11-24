@@ -15,7 +15,7 @@ services:
       DB_DATABASE: inscripciones
       DB_USERNAME: inscripciones
       DB_PASSWORD: ${DB_PASSWORD:-secret}
-      SESSION_DRIVER: file
+      SESSION_DRIVER: database
       CACHE_DRIVER: file
       QUEUE_CONNECTION: sync
     volumes:
