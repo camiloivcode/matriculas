@@ -49,7 +49,7 @@
         <span class="d-block text-center fw-semibold" style="color: #39A900">FABRICA TIC</span>
       </div>
       <div class="w-100 text-center text-secondary fw-semibold">
-        Copyright &copy; Sena CNCA 2023
+        Copyright &copy; Sena CNCA 2025
       </div>
     </footer>
     
