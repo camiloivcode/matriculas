@@ -1,0 +1,43 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_KEY: ${APP_KEY:?Define APP_KEY en .env (php artisan key:generate --show)}
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      LOG_CHANNEL: stderr
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: inscripciones
+      DB_USERNAME: inscripciones
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      SESSION_DRIVER: file
+      CACHE_DRIVER: file
+      QUEUE_CONNECTION: sync
+    volumes:
+      - app-storage:/var/www/html/storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: inscripciones
+      POSTGRES_USER: inscripciones
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inscripciones -d inscripciones"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  app-storage:
+  db-data:

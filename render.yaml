@@ -1,0 +1,52 @@
+databases:
+  - name: matriculas-db
+    databaseName: inscripciones
+    user: inscripciones
+    plan: free
+
+services:
+  - type: web
+    name: matriculas
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        sync: false   # poner la URL pública de Render tras el primer deploy, p. ej. https://matriculas.onrender.com
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: matriculas-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: matriculas-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: matriculas-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: matriculas-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: matriculas-db
+          property: password
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync

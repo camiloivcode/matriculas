@@ -13,12 +13,14 @@ Los textos, nombres de campos, rutas y tablas están en español. Mantén esa co
 
 ## Comandos
 
-Entorno local (en la máquina actual no hay `php` ni `composer` instalados, y no existe `vendor/`; hay que instalarlos antes de correr nada):
+Entorno principal: Docker (`docker compose up -d --build`, app en http://localhost:8080, PostgreSQL 16 en el servicio `db`). Producción: Render con `render.yaml` (web Docker + PostgreSQL gestionado). Antes, crear `.env` con `APP_KEY` (`php artisan key:generate --show` o cualquier `base64:` de 32 bytes). Las migraciones corren solas al arrancar el contenedor (`docker/entrypoint.sh`). Para comandos artisan dentro del contenedor: `docker compose exec app php artisan ...`.
+
+Ejecución sin Docker (requiere PHP 8.2 con pdo_pgsql, zip, gd, intl, bcmath):
 
 ```bash
 composer install
 cp .env.example .env && php artisan key:generate
-# Configurar DB_* en .env: DB_CONNECTION=mysql, base "inscripciones"
+# Configurar DB_* en .env: DB_CONNECTION=pgsql, base "inscripciones"
 php artisan migrate
 php artisan serve
 ```
@@ -54,7 +56,7 @@ Los tests son el ejemplo por defecto de Laravel; no hay cobertura real de la ló
 
 **Almacenamiento de archivos**: todo va al disco `local` (`storage/app/`) bajo `Archivos/{numero_ficha}/{numero_documento}/`. Esa convención está repetida en `ArchivoController`, `FichaController` (crea la carpeta al crear la ficha; la mueve al editar el número) y `ZipController` (lee de `storage_path('app/Archivos/...')`). Si cambias la estructura de carpetas, cambia los tres a la vez.
 
-**Descargas ZIP** (`ZipController`): generan el ZIP dentro de `public/` (por aprendiz: `{numeroDocumento}.zip`; por ficha: `{ficha}.zip`) y lo devuelven con `response()->download`. Nunca se borran: los archivos se acumulan en `public/`.
+**Descargas ZIP** (`ZipController`): generan el ZIP temporalmente dentro de `public/` (por aprendiz: `{numeroDocumento}.zip`; por ficha: `{ficha}.zip`) y lo devuelven con `deleteFileAfterSend(true)`. Ambas rutas exigen `auth`; no quites ese middleware.
 
 **Importación masiva**: `AprendizController::store` usa `App\Imports\AprendicesImport` (maatwebsite/excel 3.1.47). Espera encabezados `tipo_documento`, `numero_documento`, `nombre`, `estado`, `ficha`; resuelve la ficha por su número mediante `Ficha::pluck('id', 'ficha')`, así que una ficha inexistente rompe la fila.
 
@@ -67,4 +69,6 @@ Los tests son el ejemplo por defecto de Laravel; no hay cobertura real de la ló
 - Código muerto o incompleto que parece funcional: `ArchivoController::index`, `loadView`, `downloadArchivo` están vacíos; `UsuarioController::desacarga` usa `Storage` sin importarlo y no tiene ruta; `UsuarioController::register` está comentado; `AprendizController::update` y `destroy` no comprueban si el aprendiz existe.
 - `FichaController` usa `DB::select` dentro de bucles por ficha para contar aprendices y archivos (N+1). Aceptable con pocas fichas.
 - `README.md` es el de Laravel sin cambios; no describe el proyecto.
+- La base es PostgreSQL (`DB_CONNECTION=pgsql`). El entrypoint escucha en `$PORT` si Render lo define.
+- `numero_documento` es `string(20)` desde la migración `2026_11_24_000000`; un `integer` rompía con documentos de 11 dígitos.
 - `.env.example` apunta a `MAIL_HOST=mailpit` y `DB_DATABASE=inscripciones`; no copies credenciales reales al repo (`.env` está ignorado).
